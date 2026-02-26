@@ -6,15 +6,15 @@ from pathlib import Path
 from typing import Any
 
 import draccus
-from lerobot_convertor.lerobot_target import LeRobotDatasetConvertor
-from lerobot_convertor.models import ConversionOptions, NormalizedEpisode, NormalizedFrame
+from lerobot_converter.lerobot_target import LeRobotDatasetConverter
+from lerobot_converter.models import ConversionOptions, NormalizedEpisode, NormalizedFrame
 
 
-class Hdf5ToLeRobotConvertor(LeRobotDatasetConvertor[str | Path]):
+class Hdf5ToLeRobotConverter(LeRobotDatasetConverter[str | Path]):
     """Thin HDF5 adapter template.
 
     Design intent:
-    - target writing lifecycle is handled by ``LeRobotDatasetConvertor``;
+    - target writing lifecycle is handled by ``LeRobotDatasetConverter``;
     - source extraction and feature alignment are implemented by users in
       ``extract_episode_from_file``;
     - every step should be returned in an adapter-neutral frame schema:
@@ -149,5 +149,8 @@ def run_hdf5_adapter_example(cfg: Hdf5AdapterExampleConfig):
     if cfg.options.features is None:
         raise ValueError("Provide --options.features.")
     raise NotImplementedError(
-        "Hdf5ToLeRobotConvertor is a template. Subclass it and implement extract_episode_from_file()."
+        "Hdf5ToLeRobotConverter is a template. Subclass it and implement extract_episode_from_file()."
     )
+
+
+Hdf5ToLeRobotConvertor = Hdf5ToLeRobotConverter

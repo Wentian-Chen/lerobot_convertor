@@ -8,7 +8,7 @@ from pprint import pformat
 import random
 from typing import Any
 
-from lerobot_convertor.models import ConversionOptions
+from lerobot_converter.models import ConversionOptions
 
 
 @dataclass(slots=True, frozen=True)

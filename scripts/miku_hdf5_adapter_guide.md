@@ -1,8 +1,8 @@
 # Miku HDF5 -> LeRobot 转换流程说明
 
-> 本脚本**复用** [src/lerobot_convertor/hdf5_adapter.py](src/lerobot_convertor/hdf5_adapter.py) 的标准流程。
+> 本脚本**复用** [src/lerobot_converter/hdf5_adapter.py](src/lerobot_converter/hdf5_adapter.py) 的标准流程。
 > 你只需要在子类里实现 `extract_episode_from_file(...)`，其余 episode 遍历、frame 校验、save/finalize 都由基类处理。
-> 运行参数规范定义在 [src/lerobot_convertor/models.py](src/lerobot_convertor/models.py) 的 `Hdf5AdapterRunConfig` 与 `ConversionOptions`。
+> 运行参数规范定义在 [src/lerobot_converter/models.py](src/lerobot_converter/models.py) 的 `Hdf5AdapterRunConfig` 与 `ConversionOptions`。
 
 ## 1) 数据结构约定（输入）
 每个 HDF5 文件代表一条 episode，关键字段：
@@ -14,7 +14,7 @@
 - 时间戳优先级：`/left_arm/timestamp` > `/cam_head/timestamp` > `/cam_wrist/timestamp`
 
 ## 2) Episode 读取（由基类处理）
-- 读取入口在 `Hdf5ToLeRobotConvertor.iter_source_episodes(...)`：
+- 读取入口在 `Hdf5ToLeRobotConverter.iter_source_episodes(...)`：
   - `source` 可以是单个 `.h5/.hdf5` 文件或目录；
   - 若是目录会自动遍历文件；
   - 每个文件会调用一次你覆写的 `extract_episode_from_file(...)`。

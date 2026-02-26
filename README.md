@@ -1,6 +1,6 @@
-# lerobot_convertor
+# lerobot_converter
 
-`lerobot_convertor` 是一个可扩展的数据集转换器框架：
+`lerobot_converter` 是一个可扩展的数据集转换器框架：
 
 - 输入：任意来源（HDF5、RLDS、自定义格式）
 - 过程：用户做“读取 + 映射 + feature 对齐”
@@ -16,7 +16,7 @@
 
 ## 目录
 
-- [lerobot\_convertor](#lerobot_convertor)
+- [lerobot\_converter](#lerobot_converter)
   - [目录](#目录)
   - [1. 安装与使用](#1-安装与使用)
   - [2. 架构与职责](#2-架构与职责)
@@ -46,9 +46,9 @@
 在项目目录安装（开发模式）：
 
 ```bash
-conda create -n lerobot_convertor python=3.8 -y
-conda activate lerobot_convertor
-cd lerobot_convertor/
+conda create -n lerobot_converter python=3.8 -y
+conda activate lerobot_converter
+cd lerobot_converter/
 pip install -e .
 ```
 
@@ -76,19 +76,19 @@ python scripts/miku_hdf5_adapter.py \
 
 ### 封装好的部分（你不需要改）
 
-- `LeRobotDatasetConvertor`（`lerobot_target.py`）
+- `LeRobotDatasetConverter`（`lerobot_target.py`）
   - 调用官方 API 创建目标数据集
   - 自动遍历 episode / frame
   - 调用 `add_frame`、`save_episode`、`finalize`
   - 校验 `feature_values` key 是否与 `features` 对齐
 
-- `Hdf5ToLeRobotConvertor` / `RldsToLeRobotConvertor`
+- `Hdf5ToLeRobotConverter` / `RldsToLeRobotConverter`
   - 提供薄模板适配层
   - 暴露用户应重写的入口
 
 ### 需要用户实现的部分（核心）
 
-- 确定好你的`feature`字典（即meta/info.json的feature部分），将其传入`DatasetsConvertorConfig.features`，并重写`extract_episode_from_file(...)`函数，实现从你的数据集文件里读取完整的一条episode数据，并将episode分割成每一frame。
+- 确定好你的`feature`字典（即meta/info.json的feature部分），将其传入`DatasetsConverterConfig.features`，并重写`extract_episode_from_file(...)`函数，实现从你的数据集文件里读取完整的一条episode数据，并将episode分割成每一frame。
 
 用户必须保证每一frame结构为：
 
@@ -125,7 +125,7 @@ python scripts/miku_hdf5_adapter.py \
 配置定义统一在 `models.py`：
 
 - `ConversionOptions`：转换运行参数
-- `DatasetsConvertorConfig`：脚本级配置模板（可继承）
+- `DatasetsConverterConfig`：脚本级配置模板（可继承）
 
 ### `ConversionOptions` 字段
 
@@ -214,9 +214,9 @@ python scripts/miku_hdf5_adapter.py \
 - `select_task_for_episode(options, source_root, instructions)`：按配置返回 episode task
 
 ```python
-from lerobot_convertor.utils import load_task_instructions, select_task_for_episode
+from lerobot_converter.utils import load_task_instructions, select_task_for_episode
 
-class YourHdf5Convertor(Hdf5ToLeRobotConvertor):
+class YourHdf5Converter(Hdf5ToLeRobotConverter):
   def __init__(self) -> None:
     super().__init__()
     self._source_root = None
@@ -251,7 +251,7 @@ class YourHdf5Convertor(Hdf5ToLeRobotConvertor):
 
 ### A. 新增你自己的 HDF5 适配器（推荐）
 
-1. 继承 `Hdf5ToLeRobotConvertor`
+1. 继承 `Hdf5ToLeRobotConverter`
 2. 实现 `extract_episode_from_file(...)`
 3. 在脚本函数里配置 `features`
 4. 调用 `convert(...)` + `finalize_target()`
@@ -259,7 +259,7 @@ class YourHdf5Convertor(Hdf5ToLeRobotConvertor):
 ### B. 你应该写在哪里
 
 - 业务映射逻辑：`lc_scripts/your_adapter.py` 的 `extract_episode_from_file`
-- 参数默认值：你自己的 `Config` dataclass（继承 `DatasetsConvertorConfig`）
+- 参数默认值：你自己的 `Config` dataclass（继承 `DatasetsConverterConfig`）
 - 特征定义：脚本 `run_xxx_adapter` 中的 `feature` 字典
 
 ---
@@ -306,7 +306,7 @@ python scripts/inspect_hdf5.py <your_file.hdf5>
 或在代码中调用：
 
 ```python
-from lerobot_convertor.utils import print_hdf5_structure
+from lerobot_converter.utils import print_hdf5_structure
 
 print_hdf5_structure(source="path/to/data.hdf5", max_depth=10)
 ```
@@ -316,7 +316,7 @@ print_hdf5_structure(source="path/to/data.hdf5", max_depth=10)
 对于 RLDS 格式，可以对迭代器采样打印结构：
 
 ```python
-from lerobot_convertor.utils import print_rlds_structure
+from lerobot_converter.utils import print_rlds_structure
 
 # source 参数为 RLDS 的数据集迭代对象
 print_rlds_structure(source=dataset_iterable, max_episodes=3)

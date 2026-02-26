@@ -32,7 +32,7 @@ class NormalizedEpisode:
 
 @dataclass(slots=True, frozen=True)
 class ConversionOptions:
-    """Runtime options shared by all convertors."""
+    """Runtime options shared by all converters."""
 
     dataset_name: str = "converted_dataset"
     fps: int = 30
@@ -46,8 +46,8 @@ class ConversionOptions:
 
 
 @dataclass
-class DatasetsConvertorConfig:
-    """Standard runtime config for Lerobot Convertor scripts."""
+class DatasetsConverterConfig:
+    """Standard runtime config for LeRobot converter scripts."""
 
     source: str = ""
     output_dir: str = ""
@@ -66,6 +66,9 @@ class DatasetsConvertorConfig:
         valid_keys = {item.name for item in fields(ConversionOptions)}
         kwargs = {key: getattr(self, key) for key in valid_keys if hasattr(self, key)}
         return ConversionOptions(**kwargs)
+
+
+DatasetsConvertorConfig = DatasetsConverterConfig
 
 
 @dataclass(slots=True, frozen=True)

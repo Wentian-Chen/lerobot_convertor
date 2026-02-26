@@ -4,11 +4,11 @@ from pathlib import Path
 from typing import Generic
 
 from lerobot.datasets.lerobot_dataset import LeRobotDataset
-from lerobot_convertor.base import BaseDatasetConvertor, TSource
-from lerobot_convertor.models import ConversionOptions, ConversionReport, NormalizedEpisode, NormalizedFrame
+from lerobot_converter.base import BaseDatasetConverter, TSource
+from lerobot_converter.models import ConversionOptions, ConversionReport, NormalizedEpisode, NormalizedFrame
 
 
-class LeRobotDatasetConvertor(BaseDatasetConvertor[TSource], Generic[TSource]):
+class LeRobotDatasetConverter(BaseDatasetConverter[TSource], Generic[TSource]):
     """Episode-oriented target writer backed by official LeRobotDataset APIs."""
 
     def __init__(self) -> None:
@@ -146,3 +146,6 @@ class LeRobotDatasetConvertor(BaseDatasetConvertor[TSource], Generic[TSource]):
         self._feature_keys = set()
         self._episode_count = 0
         self._frame_count = 0
+
+
+LeRobotDatasetConvertor = LeRobotDatasetConverter

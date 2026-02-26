@@ -5,12 +5,12 @@ from collections.abc import Iterable
 from pathlib import Path
 from typing import Any, Generic, TypeVar
 
-from lerobot_convertor.models import ConversionOptions, ConversionReport, NormalizedEpisode, NormalizedFrame
+from lerobot_converter.models import ConversionOptions, ConversionReport, NormalizedEpisode, NormalizedFrame
 
 TSource = TypeVar("TSource")
 
 
-class BaseDatasetConvertor(ABC, Generic[TSource]):
+class BaseDatasetConverter(ABC, Generic[TSource]):
     """Base abstraction for source->target dataset conversion pipelines."""
 
     @abstractmethod
@@ -56,4 +56,7 @@ class BaseDatasetConvertor(ABC, Generic[TSource]):
         options: ConversionOptions,
     ) -> NormalizedEpisode:
         """Build one normalized episode from source-specific episode data."""
+
+
+BaseDatasetConvertor = BaseDatasetConverter
 

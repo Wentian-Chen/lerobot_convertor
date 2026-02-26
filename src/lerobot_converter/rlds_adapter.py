@@ -7,11 +7,11 @@ from typing import Any
 
 import draccus
 
-from lerobot_convertor.lerobot_target import LeRobotDatasetConvertor
-from lerobot_convertor.models import ConversionOptions, NormalizedEpisode, NormalizedFrame
+from lerobot_converter.lerobot_target import LeRobotDatasetConverter
+from lerobot_converter.models import ConversionOptions, NormalizedEpisode, NormalizedFrame
 
 
-class RldsToLeRobotConvertor(LeRobotDatasetConvertor[Iterable[dict[str, Any]]]):
+class RldsToLeRobotConverter(LeRobotDatasetConverter[Iterable[dict[str, Any]]]):
     """Thin RLDS adapter template.
 
     Users are expected to provide source episodes with this shape:
@@ -31,7 +31,7 @@ class RldsToLeRobotConvertor(LeRobotDatasetConvertor[Iterable[dict[str, Any]]]):
     def iter_source_episodes(
         self,
         source: Iterable[dict[str, Any]],
-        options: ConversionOptions,
+        _options: ConversionOptions,
     ) -> Iterable[dict[str, Any]]:
         for episode in source:
             yield episode
@@ -85,7 +85,7 @@ class RldsAdapterExampleConfig:
 
 @draccus.wrap()
 def run_rlds_adapter_example(cfg: RldsAdapterExampleConfig):
-    adapter = RldsToLeRobotConvertor()
+    adapter = RldsToLeRobotConverter()
     if not cfg.source:
         raise ValueError("Provide --source path to a RLDS JSON/JSONL file.")
     if not cfg.output_dir:
@@ -108,3 +108,6 @@ def run_rlds_adapter_example(cfg: RldsAdapterExampleConfig):
         raise ValueError("Provide --options.features and ensure each step contains 'feature_values'.")
     adapter.convert(episodes, cfg.output_dir, cfg.options)
     adapter.finalize_target()
+
+
+RldsToLeRobotConvertor = RldsToLeRobotConverter

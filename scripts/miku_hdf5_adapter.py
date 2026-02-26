@@ -11,12 +11,12 @@ SRC_DIR = PROJECT_ROOT / "src"
 if str(SRC_DIR) not in sys.path:
     sys.path.append(str(SRC_DIR))
 
-from lerobot_convertor.hdf5_adapter import Hdf5ToLeRobotConvertor
-from lerobot_convertor.models import ConversionOptions, DatasetsConvertorConfig
-from lerobot_convertor.utils import load_task_instructions, select_task_for_episode
+from lerobot_converter.hdf5_adapter import Hdf5ToLeRobotConverter
+from lerobot_converter.models import ConversionOptions, DatasetsConverterConfig
+from lerobot_converter.utils import load_task_instructions, select_task_for_episode
 
 
-class MikuSingleEpisodeHdf5Convertor(Hdf5ToLeRobotConvertor):
+class MikuSingleEpisodeHdf5Converter(Hdf5ToLeRobotConverter):
     """Adapter for datasets where each HDF5 file is exactly one episode.
 
     Expected structure per file:
@@ -179,7 +179,7 @@ class MikuSingleEpisodeHdf5Convertor(Hdf5ToLeRobotConvertor):
         return normalized.astype(np.float64)
 
 @dataclass
-class MikuHdf5AdapterConfig(DatasetsConvertorConfig):
+class MikuHdf5AdapterConfig(DatasetsConverterConfig):
     source: str = ""
     output_dir: str = ""
     dataset_name: str = ""
@@ -288,7 +288,7 @@ def run_miku_hdf5_adapter(cfg: MikuHdf5AdapterConfig):
             timestamp_key=options.timestamp_key,
         )
 
-    adapter = MikuSingleEpisodeHdf5Convertor()
+    adapter = MikuSingleEpisodeHdf5Converter()
     adapter.convert(cfg.source, cfg.output_dir, options)
     report = adapter.finalize_target()
     print(report)
