@@ -15,9 +15,11 @@ from lerobot_convertor.utils import (
     Hdf5NodeInfo,
     RldsSampleInfo,
     inspect_hdf5_structure,
+    load_task_instructions,
     inspect_rlds_structure,
     print_hdf5_structure,
     print_rlds_structure,
+    select_task_for_episode,
 )
 
 __all__ = [
@@ -33,7 +35,9 @@ __all__ = [
     "Hdf5NodeInfo",
     "RldsSampleInfo",
     "inspect_hdf5_structure",
+    "load_task_instructions",
     "print_hdf5_structure",
     "inspect_rlds_structure",
     "print_rlds_structure",
+    "select_task_for_episode",
 ]

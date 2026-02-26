@@ -2,9 +2,13 @@ from __future__ import annotations
 
 from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
+import json
 from pathlib import Path
 from pprint import pformat
+import random
 from typing import Any
+
+from lerobot_convertor.models import ConversionOptions
 
 
 @dataclass(slots=True, frozen=True)
@@ -27,6 +31,72 @@ class RldsSampleInfo:
     step_count: int | None
     step_keys: list[str]
     extras: dict[str, Any]
+
+
+def load_task_instructions(
+    source_root: str | Path,
+    instruction_file_name: str = "tasks_instruction.json",
+) -> list[str]:
+    """Load task instructions from source root.
+
+    Supported JSON payload formats:
+    - list[str]
+    - {"tasks": list[str]}
+    - {"task_instructions": list[str]}
+    """
+
+    file_path = Path(source_root) / instruction_file_name
+    if not file_path.exists():
+        raise FileNotFoundError(
+            f"augment_task_instruction=True but file not found: {file_path}"
+        )
+
+    payload = json.loads(file_path.read_text(encoding="utf-8"))
+    if isinstance(payload, list):
+        raw_items = payload
+    elif isinstance(payload, dict):
+        if isinstance(payload.get("tasks"), list):
+            raw_items = payload["tasks"]
+        elif isinstance(payload.get("task_instructions"), list):
+            raw_items = payload["task_instructions"]
+        else:
+            raw_items = []
+    else:
+        raw_items = []
+
+    return [str(item).strip() for item in raw_items if str(item).strip()]
+
+
+def select_task_for_episode(
+    options: ConversionOptions,
+    source_root: str | Path | None = None,
+    instructions: list[str] | None = None,
+    instruction_file_name: str = "tasks_instruction.json",
+) -> str:
+    """Select one task text for current episode.
+
+    Priority:
+    - if ``augment_task_instruction`` is disabled: return ``default_task``;
+    - else use provided ``instructions``;
+    - else load from ``<source_root>/tasks_instruction.json``.
+    """
+
+    if not options.augment_task_instruction:
+        return options.default_task
+
+    loaded_instructions = instructions
+    if loaded_instructions is None:
+        if source_root is None:
+            raise RuntimeError("Source root is not initialized before loading task instructions.")
+        loaded_instructions = load_task_instructions(
+            source_root=source_root,
+            instruction_file_name=instruction_file_name,
+        )
+
+    if not loaded_instructions:
+        raise ValueError("tasks_instruction.json is empty or has no valid instruction strings.")
+
+    return random.choice(loaded_instructions)
 
 
 def inspect_hdf5_structure(

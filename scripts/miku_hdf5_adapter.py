@@ -1,7 +1,5 @@
 from dataclasses import dataclass
-import json
 from pathlib import Path
-import random
 import sys
 from typing import Any
 
@@ -15,6 +13,7 @@ if str(SRC_DIR) not in sys.path:
 
 from lerobot_convertor.hdf5_adapter import Hdf5ToLeRobotConvertor
 from lerobot_convertor.models import ConversionOptions, DatasetsConvertorConfig
+from lerobot_convertor.utils import load_task_instructions, select_task_for_episode
 
 
 class MikuSingleEpisodeHdf5Convertor(Hdf5ToLeRobotConvertor):
@@ -44,6 +43,8 @@ class MikuSingleEpisodeHdf5Convertor(Hdf5ToLeRobotConvertor):
         source_path = Path(source)
         self._source_root = source_path if source_path.is_dir() else source_path.parent
         self._task_instructions_cache = None
+        if options.augment_task_instruction:
+            self._task_instructions_cache = load_task_instructions(self._source_root)
         return super().iter_source_episodes(source, options)
 
     def extract_episode_from_file(
@@ -57,7 +58,11 @@ class MikuSingleEpisodeHdf5Convertor(Hdf5ToLeRobotConvertor):
         if options.features is None:
             raise ValueError("ConversionOptions.features is required.")
 
-        task = self._select_task_for_episode(options)
+        task = select_task_for_episode(
+            options=options,
+            source_root=self._source_root,
+            instructions=self._task_instructions_cache,
+        )
 
         feature_keys = set(options.features.keys())
         cam_head_color = self._read_array(file_obj, "cam_head/color")
@@ -120,44 +125,6 @@ class MikuSingleEpisodeHdf5Convertor(Hdf5ToLeRobotConvertor):
             )
 
         return {"episode_id": episode_id, "steps": steps}
-
-    def _select_task_for_episode(self, options: ConversionOptions) -> str:
-        if not options.augment_task_instruction:
-            return options.default_task
-
-        instructions = self._load_task_instructions()
-        if not instructions:
-            raise ValueError("tasks_instruction.json is empty or has no valid instruction strings.")
-        return random.choice(instructions)
-
-    def _load_task_instructions(self) -> list[str]:
-        if self._task_instructions_cache is not None:
-            return self._task_instructions_cache
-        if self._source_root is None:
-            raise RuntimeError("Source root is not initialized before loading task instructions.")
-
-        file_path = self._source_root / "tasks_instruction.json"
-        if not file_path.exists():
-            raise FileNotFoundError(
-                f"augment_task_instruction=True but file not found: {file_path}"
-            )
-
-        payload = json.loads(file_path.read_text(encoding="utf-8"))
-        if isinstance(payload, list):
-            raw_items = payload
-        elif isinstance(payload, dict):
-            if isinstance(payload.get("tasks"), list):
-                raw_items = payload["tasks"]
-            elif isinstance(payload.get("task_instructions"), list):
-                raw_items = payload["task_instructions"]
-            else:
-                raw_items = []
-        else:
-            raw_items = []
-
-        instructions = [str(item).strip() for item in raw_items if str(item).strip()]
-        self._task_instructions_cache = instructions
-        return instructions
 
     @staticmethod
     def _read_array(file_obj: Any, key: str) -> np.ndarray:
