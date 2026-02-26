@@ -108,6 +108,3 @@ def run_rlds_adapter_example(cfg: RldsAdapterExampleConfig):
         raise ValueError("Provide --options.features and ensure each step contains 'feature_values'.")
     adapter.convert(episodes, cfg.output_dir, cfg.options)
     adapter.finalize_target()
-
-
-RldsToLeRobotConvertor = RldsToLeRobotConverter

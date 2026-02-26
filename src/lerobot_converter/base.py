@@ -57,6 +57,3 @@ class BaseDatasetConverter(ABC, Generic[TSource]):
     ) -> NormalizedEpisode:
         """Build one normalized episode from source-specific episode data."""
 
-
-BaseDatasetConvertor = BaseDatasetConverter
-

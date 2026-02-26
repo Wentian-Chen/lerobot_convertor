@@ -68,8 +68,6 @@ class DatasetsConverterConfig:
         return ConversionOptions(**kwargs)
 
 
-DatasetsConvertorConfig = DatasetsConverterConfig
-
 
 @dataclass(slots=True, frozen=True)
 class ConversionReport:

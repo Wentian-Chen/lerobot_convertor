@@ -147,5 +147,3 @@ class LeRobotDatasetConverter(BaseDatasetConverter[TSource], Generic[TSource]):
         self._episode_count = 0
         self._frame_count = 0
 
-
-LeRobotDatasetConvertor = LeRobotDatasetConverter

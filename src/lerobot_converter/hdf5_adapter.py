@@ -152,5 +152,3 @@ def run_hdf5_adapter_example(cfg: Hdf5AdapterExampleConfig):
         "Hdf5ToLeRobotConverter is a template. Subclass it and implement extract_episode_from_file()."
     )
 
-
-Hdf5ToLeRobotConvertor = Hdf5ToLeRobotConverter
