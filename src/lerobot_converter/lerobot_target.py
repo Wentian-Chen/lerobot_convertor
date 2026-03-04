@@ -7,6 +7,8 @@ from lerobot.datasets.lerobot_dataset import LeRobotDataset
 from lerobot_converter.base import BaseDatasetConverter, TSource
 from lerobot_converter.models import ConversionOptions, ConversionReport, NormalizedEpisode, NormalizedFrame
 
+import os
+os.environ["SVT_LOG"] = "1"  # suppress the logs of SVT (except in the case of an error)
 
 class LeRobotDatasetConverter(BaseDatasetConverter[TSource], Generic[TSource]):
     """Episode-oriented target writer backed by official LeRobotDataset APIs."""
