@@ -91,17 +91,29 @@ class MikuSingleEpisodeHdf5Converter(Hdf5ToLeRobotConverter):
             feature_values: dict[str, Any] = {}
 
             if "observation.state" in feature_keys:
-                state = np.concatenate(
-                    [left_arm_qpos[idx].astype(np.float64), np.asarray([left_arm_gripper[idx]], dtype=np.float64)],
-                    axis=0,
-                )
+                if MikuHdf5AdapterConfig.state_type == 'joint':
+                    state = np.concatenate(
+                        [left_arm_joint[idx].astype(np.float64), np.asarray([left_arm_gripper[idx]], dtype=np.float64)],
+                        axis=0,
+                    )
+                elif MikuHdf5AdapterConfig.state_type == 'qpos':
+                    state = np.concatenate(
+                        [left_arm_qpos[idx].astype(np.float64), np.asarray([left_arm_gripper[idx]], dtype=np.float64)],
+                        axis=0,
+                    )
                 feature_values["observation.state"] = state
 
             if "action" in feature_keys:
-                action = np.concatenate(
-                    [left_arm_joint[idx].astype(np.float64), np.asarray([left_arm_gripper[idx]], dtype=np.float64)],
-                    axis=0,
-                )
+                if MikuHdf5AdapterConfig.action_type == 'joint':
+                    action = np.concatenate(
+                        [left_arm_joint[idx].astype(np.float64), np.asarray([left_arm_gripper[idx]], dtype=np.float64)],
+                        axis=0,
+                    )
+                elif MikuHdf5AdapterConfig.action_type == 'qpos':
+                    action = np.concatenate(
+                        [left_arm_qpos[idx].astype(np.float64), np.asarray([left_arm_gripper[idx]], dtype=np.float64)],
+                        axis=0,
+                    )
                 feature_values["action"] = action
 
             if "observation.images.image" in feature_keys:
@@ -115,7 +127,7 @@ class MikuSingleEpisodeHdf5Converter(Hdf5ToLeRobotConverter):
                 raise ValueError(
                     f"extract_episode_from_file failed to populate feature keys: {sorted(missing)}"
                 )
-
+            
             steps.append(
                 {
                     "task": task,
@@ -189,6 +201,8 @@ class MikuHdf5AdapterConfig(DatasetsConverterConfig):
     features: dict[str, dict[str, Any]] | None = None
     default_task: str = ""
     augment_task_instruction: bool = False
+    state_type: str = 'joint'
+    action_type: str = 'joint'
 
 @draccus.wrap()
 def run_miku_hdf5_adapter(cfg: MikuHdf5AdapterConfig):
